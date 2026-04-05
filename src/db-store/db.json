@@ -1,0 +1,30 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "username": "josh@example.com",
+            "password": "josh1234",
+            "role": "ADMIN",
+            "name": "Josh Smith",
+            "email": "josh@example.com",
+            "phone": "123-456-7890",
+            "department": "HR",
+            "position": "HR Manager",
+            "dateOfJoining": "2020-01-15",
+            "profilePicture": "https://example.com/profiles/josh.jpg"
+        },
+        {
+            "id": 2,
+            "username": "anthony@example.com",
+            "password": "anthony1234",
+            "role": "USER",
+            "name": "Anthony Smith",
+            "email": "anthony@example.com",
+            "phone": "098-765-4321",
+            "department": "IT",
+            "position": "Software Engineer",
+            "dateOfJoining": "2021-03-20",
+            "profilePicture": "https://example.com/profiles/anthony.jpg"
+        }
+    ]
+}
