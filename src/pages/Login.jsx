@@ -2,13 +2,12 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export default function Sidebar({ onLoginClick }) {
+export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [open, setOpen] = useState(false);
 
   const handleLogin = async () => {
     const res = await fetch(
@@ -20,7 +19,6 @@ export default function Sidebar({ onLoginClick }) {
       const user = data[0];
       login(user);
 
-      // role redirect
       if (user.role === "ADMIN") {
         navigate("/admin");
       } else {
@@ -32,30 +30,34 @@ export default function Sidebar({ onLoginClick }) {
   };
 
   return (
-    <div className="mt-auto p-4 border-t dark:border-gray-700">
+    <div className="space-y-4 p-6">
 
-  {!user ? (
-    <button
-      onClick={onLoginClick}
-      className="w-full bg-primary text-white py-2 rounded-lg hover:opacity-90"
-    >
-      Login
-    </button>
-  ) : (
-    <div className="space-y-2">
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        {user.username}
-      </p>
+      <input
+        placeholder="Email"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className="w-full px-4 py-2 rounded-lg border border-gray-300 
+        dark:border-gray-600 bg-white dark:bg-gray-800 
+        text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full px-4 py-2 rounded-lg border border-gray-300 
+        dark:border-gray-600 bg-white dark:bg-gray-800 
+        text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+      />
 
       <button
-        onClick={logout}
-        className="w-full bg-red-500 text-white py-2 rounded-lg"
+        onClick={handleLogin}
+        className="w-full bg-primary text-black py-2 rounded-lg hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
       >
-        Logout
+        Login
       </button>
-    </div>
-  )}
 
-</div>
+    </div>
   );
 }

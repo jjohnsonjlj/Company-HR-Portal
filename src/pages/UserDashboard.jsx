@@ -1,86 +1,122 @@
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import RequestForm from "../components/user/RequestForm";
+import RequestList from "../components/user/RequestList";
+import Toast from "../components/Toast";
 
 export default function UserDashboard() {
-  const { user, login } = useAuth();
-  const [form, setForm] = useState(user);
-  const [tab, setTab] = useState("profile");
+  const { user } = useAuth();
 
-  const handleUpdate = async () => {
-    const res = await fetch(`http://localhost:3001/users/${user.id}`, {
-      method: "PUT",
+  const [requests, setRequests] = useState([]);
+  const [type, setType] = useState("timeoff");
+
+  const [toast, setToast] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const [form, setForm] = useState({
+    startDate: "",
+    endDate: "",
+    serviceNeeded: "",
+    amount: "",
+    reason: "",
+  });
+
+  const fetchData = async () => {
+    const data = await fetch("http://localhost:3001/requests").then(r => r.json());
+    setRequests(data.filter(r => r.userId === user.id));
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2500);
+  };
+
+  const validate = () => {
+    const e = {};
+
+    if (type === "timeoff" && !form.startDate) e.startDate = "Required";
+
+    if (type === "service") {
+      if (!form.serviceNeeded) e.serviceNeeded = "Required";
+      if (!form.startDate) e.startDate = "Required";
+    }
+
+    if (type === "reimbursement") {
+      if (!form.amount) e.amount = "Required";
+      if (!form.reason) e.reason = "Required";
+    }
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const submit = async () => {
+    if (!validate()) return;
+
+    await fetch("http://localhost:3001/requests", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        id: `req-${Date.now()}`,
+        userId: user.id,
+        type,
+        status: "pending",
+        ...form,
+      }),
     });
 
-    const updated = await res.json();
-    login(updated);
+    setForm({
+      startDate: "",
+      endDate: "",
+      serviceNeeded: "",
+      amount: "",
+      reason: "",
+    });
+
+    showToast("Request submitted");
+    fetchData();
   };
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-8">
 
-      <h1 className="text-3xl font-semibold">My Dashboard</h1>
+      <Toast message={toast} />
 
-      {/* Tabs */}
-      <div className="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-fit">
-        {["profile", "requests", "onboarding"].map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-4 py-2 rounded-md text-sm capitalize transition
-              ${
-                tab === t
-                  ? "bg-white dark:bg-gray-900 shadow"
-                  : "text-gray-500"
-              }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <h1 className="text-2xl font-semibold">My Dashboard</h1>
 
-      {/* Content */}
-      <div className="p-6 rounded-xl bg-white dark:bg-gray-800 shadow border border-gray-200 dark:border-gray-700">
+      <RequestForm
+        type={type}
+        setType={setType}
+        form={form}
+        setForm={setForm}
+        errors={errors}
+        setErrors={setErrors}
+        onSubmit={submit}
+      />
 
-        {tab === "profile" && (
-          <div className="grid gap-4">
+      <RequestList
+        requests={requests}
+        onDelete={async (id) => {
+          await fetch(`http://localhost:3001/requests/${id}`, {
+            method: "DELETE",
+          });
+          fetchData();
+        }}
+      />
 
-            <input
-              value={form.name || ""}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="p-3 border rounded bg-gray-50 dark:bg-gray-700"
-            />
-
-            <input
-              value={form.email || ""}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="p-3 border rounded bg-gray-50 dark:bg-gray-700"
-            />
-
-            <button
-              onClick={handleUpdate}
-              className="bg-primary text-white px-4 py-2 rounded-lg w-fit"
-            >
-              Save Changes
-            </button>
-          </div>
-        )}
-
-        {tab === "requests" && (
-          <p className="text-gray-500">Requests coming next...</p>
-        )}
-
-        {tab === "onboarding" && (
-          <ul className="space-y-2 text-sm">
-            <li>✔ Profile complete</li>
-            <li>✔ Documents submitted</li>
-            <li>⬜ Team intro pending</li>
-          </ul>
-        )}
-
-      </div>
-
+      <style>{`
+        .animate-slide-in {
+          animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }

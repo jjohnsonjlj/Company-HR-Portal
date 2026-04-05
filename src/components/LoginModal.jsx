@@ -46,7 +46,9 @@ export default function LoginModal({ isOpen, onClose }) {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg border dark:bg-gray-700"
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 
+          dark:border-gray-600 bg-white dark:bg-gray-800 
+          text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary dark:placeholder-gray-400"
         />
 
         <input
@@ -54,19 +56,21 @@ export default function LoginModal({ isOpen, onClose }) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg border dark:bg-gray-700"
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 
+          dark:border-gray-600 bg-white dark:bg-gray-800 
+          text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary dark:placeholder-gray-400"
         />
 
         <button
           onClick={handleLogin}
-          className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-7 py-3 rounded-xl hover:opacity-90 transition shadow-lg w-full focus:outline-none focus:ring-2 focus:ring-primary"
         >
           Login
         </button>
 
         <button
           onClick={onClose}
-          className="w-full text-sm text-gray-500"
+          className="w-full bg-gray-200 text-gray-800 py-3 px-7 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
         >
           Cancel
         </button>

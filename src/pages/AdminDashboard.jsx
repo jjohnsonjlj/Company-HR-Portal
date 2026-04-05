@@ -1,118 +1,130 @@
 import { useEffect, useState } from "react";
-import UserDashboard from "./UserDashboard";
+import EmployeeTable from "../components/admin/EmployeeTable";
+import EmployeeModal from "../components/admin/EmployeeModal";
+import RequestsTable from "../components/admin/RequestsTable";
+import Toast from "../components/Toast";
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
-  const [view, setView] = useState("admin");
+  const [requests, setRequests] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [toast, setToast] = useState("");
 
-  const fetchUsers = async () => {
-    const res = await fetch("http://localhost:3001/users");
-    const data = await res.json();
-    setUsers(data);
+  const [errors, setErrors] = useState({});
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "USER",
+    department: "",
+    position: "",
+  });
+
+  const fetchData = async () => {
+    const u = await fetch("http://localhost:3001/users").then(r => r.json());
+    const r = await fetch("http://localhost:3001/requests").then(r => r.json());
+
+    setUsers(u);
+    setRequests(r);
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchData();
   }, []);
 
-  const handleDelete = async (id) => {
-    await fetch(`http://localhost:3001/users/${id}`, {
-      method: "DELETE",
-    });
-    fetchUsers();
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2500);
   };
 
-  if (view === "user") {
-    return (
-      <div className="space-y-6">
-        <button
-          onClick={() => setView("admin")}
-          className="px-4 py-2 rounded-lg bg-primary text-white"
-        >
-          ← Back to Admin
-        </button>
-        <UserDashboard />
-      </div>
-    );
-  }
+  const saveEmployee = async () => {
+    const e = {};
+    if (!newUser.name) e.name = "Required";
+    if (!newUser.email) e.email = "Required";
+    if (!editingUser && !newUser.password) e.password = "Required";
+    if (!newUser.department) e.department = "Required";
+    if (!newUser.position) e.position = "Required";
+
+    setErrors(e);
+    if (Object.keys(e).length) return;
+
+    if (editingUser) {
+      await fetch(`http://localhost:3001/users/${editingUser.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+      showToast("Updated");
+    } else {
+      await fetch("http://localhost:3001/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...newUser, id: `user-${Date.now()}` }),
+      });
+      showToast("Created");
+    }
+
+    setShowModal(false);
+    fetchData();
+  };
 
   return (
     <div className="space-y-8">
 
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-semibold">Admin Dashboard</h1>
+      <Toast message={toast} />
 
-        <button
-          onClick={() => setView("user")}
-          className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:opacity-80"
-        >
-          View as User
-        </button>
-      </div>
+      <RequestsTable
+        requests={requests}
+        users={users}
+        onUpdate={async (r, status) => {
+          await fetch(`http://localhost:3001/requests/${r.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...r, status }),
+          });
+          fetchData();
+        }}
+        onDelete={async (id) => {
+          await fetch(`http://localhost:3001/requests/${id}`, { method: "DELETE" });
+          fetchData();
+        }}
+      />
 
-      {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {[
-          { label: "Total Users", value: users.length },
-          { label: "Admins", value: users.filter(u => u.role === "ADMIN").length },
-          { label: "Employees", value: users.filter(u => u.role === "USER").length },
-        ].map((card, i) => (
-          <div
-            key={i}
-            className="p-6 rounded-xl bg-white dark:bg-gray-800 shadow border border-gray-200 dark:border-gray-700"
-          >
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {card.label}
-            </p>
-            <p className="text-3xl font-bold mt-2">{card.value}</p>
-          </div>
-        ))}
-      </div>
+      <EmployeeTable
+        users={users}
+        onAdd={() => setShowModal(true)}
+        onEdit={(u) => {
+          setEditingUser(u);
+          setNewUser(u);
+          setShowModal(true);
+        }}
+        onDelete={async (id) => {
+          await fetch(`http://localhost:3001/users/${id}`, { method: "DELETE" });
+          fetchData();
+        }}
+      />
 
-      {/* Table */}
-      <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-        <table className="w-full">
+      <EmployeeModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSave={saveEmployee}
+        newUser={newUser}
+        setNewUser={setNewUser}
+        errors={errors}
+        setErrors={setErrors}
+        editingUser={editingUser}
+      />
 
-          <thead className="bg-gray-100 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-300">
-            <tr>
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">Department</th>
-              <th className="p-3 text-left">Role</th>
-              <th className="p-3"></th>
-            </tr>
-          </thead>
+      <style>{`
+        .animate-fade { animation: fade 0.2s ease-in; }
+        .animate-scale-in { animation: scaleIn 0.2s ease; }
+        .animate-slide-in { animation: slideIn 0.3s ease; }
 
-          <tbody className="bg-white dark:bg-gray-900">
-            {users.map((u) => (
-              <tr
-                key={u.id}
-                className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-              >
-                <td className="p-3">{u.name}</td>
-                <td className="p-3 text-gray-500">{u.email}</td>
-                <td className="p-3">{u.department}</td>
-                <td className="p-3">
-                  <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-xs">
-                    {u.role}
-                  </span>
-                </td>
-                <td className="p-3 text-right">
-                  <button
-                    onClick={() => handleDelete(u.id)}
-                    className="text-red-500 hover:underline text-sm"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-
-        </table>
-      </div>
-
+        @keyframes fade { from {opacity:0} to {opacity:1} }
+        @keyframes scaleIn { from {transform:scale(.9);opacity:0} to {transform:scale(1);opacity:1} }
+        @keyframes slideIn { from {transform:translateX(100%);opacity:0} to {transform:translateX(0);opacity:1} }
+      `}</style>
     </div>
   );
 }

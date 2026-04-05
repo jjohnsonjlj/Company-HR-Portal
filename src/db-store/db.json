@@ -1,30 +1,88 @@
 {
-    "users": [
-        {
-            "id": 1,
-            "username": "josh@example.com",
-            "password": "josh1234",
-            "role": "ADMIN",
-            "name": "Josh Smith",
-            "email": "josh@example.com",
-            "phone": "123-456-7890",
-            "department": "HR",
-            "position": "HR Manager",
-            "dateOfJoining": "2020-01-15",
-            "profilePicture": "https://example.com/profiles/josh.jpg"
-        },
-        {
-            "id": 2,
-            "username": "anthony@example.com",
-            "password": "anthony1234",
-            "role": "USER",
-            "name": "Anthony Smith",
-            "email": "anthony@example.com",
-            "phone": "098-765-4321",
-            "department": "IT",
-            "position": "Software Engineer",
-            "dateOfJoining": "2021-03-20",
-            "profilePicture": "https://example.com/profiles/anthony.jpg"
-        }
-    ]
+  "users": [
+    {
+      "id": "1",
+      "username": "josh@example.com",
+      "password": "josh1234",
+      "role": "ADMIN",
+      "name": "Josh Smith",
+      "email": "josh@example.com",
+      "phone": "123-456-7890",
+      "department": "HR",
+      "position": "HR Manager",
+      "dateOfJoining": "2020-01-15",
+      "profilePicture": ""
+    },
+    {
+      "id": "2",
+      "username": "anthony@example.com",
+      "password": "anthony1234",
+      "role": "USER",
+      "name": "Anthony Smith",
+      "email": "anthony@example.com",
+      "phone": "098-765-4321",
+      "department": "IT",
+      "position": "Software Engineer",
+      "dateOfJoining": "2021-03-20",
+      "profilePicture": ""
+    },
+    {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "password": "john1234",
+      "role": "USER",
+      "department": "IT",
+      "position": "Dev",
+      "id": "Ohhvu5_HUfU"
+    }
+  ],
+  "requests": [
+    {
+      "id": "req-1",
+      "userId": "2",
+      "type": "timeoff",
+      "status": "approved",
+      "startDate": "2023-11-15",
+      "endDate": "2023-11-20",
+      "reason": "Medical leave"
+    },
+    {
+      "id": "req-2",
+      "userId": "1",
+      "type": "service",
+      "status": "pending",
+      "serviceNeeded": "Plumbing Repair",
+      "requestDate": "2026-04-05"
+    },
+    {
+      "id": "req-3",
+      "userId": "1",
+      "type": "reimbursement",
+      "status": "approved",
+      "amount": "1999.99",
+      "reason": "Laptop Purchase"
+    },
+    {
+      "id": "4R1xHdMn7jc",
+      "userId": "1",
+      "type": "timeoff",
+      "status": "approved",
+      "startDate": "2026-04-05",
+      "endDate": "2026-04-05"
+    },
+    {
+      "id": "4idg6vkbvOM",
+      "userId": "1",
+      "type": "timeoff",
+      "status": "pending",
+      "startDate": "2026-04-05",
+      "endDate": "",
+      "serviceNeeded": "",
+      "amount": "",
+      "reason": ""
+    }
+  ],
+  "onboarding": [],
+  "hrNotes": [],
+  "$schema": "./node_modules/json-server/schema.json"
 }

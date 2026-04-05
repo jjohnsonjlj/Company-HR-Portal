@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Home() {
   return (
     <div className="relative text-center py-28 overflow-hidden">
@@ -17,15 +19,19 @@ export default function Home() {
       </p>
 
       <div className="flex justify-center gap-4">
-        <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-7 py-3 rounded-xl hover:opacity-90 transition shadow-lg">
+        <Link
+          to="/register"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-7 py-3 rounded-xl hover:opacity-90 transition shadow-lg">
           Get Started
-        </button>
+        </Link>
 
-        <button className="bg-white border border-gray-300 px-7 py-3 rounded-xl hover:bg-gray-100 transition">
+        <Link
+          to="/about"
+          className="bg-gray-200 text-gray-800 px-7 py-3 rounded-xl hover:bg-gray-300 transition shadow-lg dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+        >
           Learn More
-        </button>
+        </Link>
       </div>
-
     </div>
   );
 }
